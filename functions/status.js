@@ -9,8 +9,9 @@ const statusCategories = {
 };
 
 exports.handler = async (event) => {
-  const query = event.queryStringParameters;
-  let code = query?.code;
+  const query = event.queryStringParameters || {};
+  let code = query.code;
+  const nojson = 'nojson' in query;
 
   if (typeof code === 'undefined') {
     code = 200;
@@ -19,6 +20,13 @@ exports.handler = async (event) => {
   const parsedCode = parseInt(code, 10);
 
   if (isNaN(parsedCode)) {
+    if (nojson) {
+      return {
+        statusCode: 500,
+        body: '',
+        headers: {}
+      };
+    }
     return {
       statusCode: 500,
       body: JSON.stringify({
@@ -33,6 +41,13 @@ exports.handler = async (event) => {
   const name = http.STATUS_CODES[parsedCode];
 
   if (!name) {
+    if (nojson) {
+      return {
+        statusCode: 501,
+        body: '',
+        headers: {}
+      };
+    }
     return {
       statusCode: 501,
       body: JSON.stringify({
@@ -41,6 +56,14 @@ exports.handler = async (event) => {
         category: statusCategories[5]
       }),
       headers: { 'Content-Type': 'application/json' }
+    };
+  }
+
+  if (nojson) {
+    return {
+      statusCode: parsedCode,
+      body: '',
+      headers: {}
     };
   }
 
