@@ -14,7 +14,8 @@ exports.handler = async (event) => {
   const nojson = 'nojson' in query;
 
   if (typeof code === 'undefined') {
-    code = 200;
+    code = 200,
+    note = "Use ?code=XXX (XXX must be a number) to return a HTTP Status Code. Adding &nojson will only return the HTTP Status Code, with &nojson you can see how the browser handles 4XX and 5XX status codes";
   }
 
   const parsedCode = parseInt(code, 10);
